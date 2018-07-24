@@ -17,14 +17,13 @@ import weka.core.Instances;
  */
 public class Assignment5
 {
+    //Only pacman game
+    private static String game = "/examples/gridphysics/pacman.txt";
+    private static String level = "/examples/gridphysics/pacman_lvl";
 
     public static void pretraining(int epoch){
         //Reinforcement learning controllers:
         String rlController = "controllers.miniAlphaZero.pretraining.Agent";
-
-        //Only pacman game
-        String game = "examples/gridphysics/pacman.txt";
-        String level = "examples/gridphysics/pacman_lvl";
 
         //Other settings
         boolean visuals = true;
@@ -39,7 +38,7 @@ public class Assignment5
         for(int i=0; i<epoch; i++){
             String levelfile = level + "0.txt";
             System.out.println("Pre-Training at ["+i+","+epoch+"]");
-            ArcadeMachine.runOneGame(game, levelfile, visuals, rlController, null, seed, false);
+            ArcadeMachine.runOneGame(makeResourcePath(game), makeResourcePath(levelfile), visuals, rlController, null, seed, false);
             InstancesStore.save();
         }
     }
@@ -48,8 +47,8 @@ public class Assignment5
         if (!InstancesStore.isStored)
             InstancesStore.load();
 
-        // Instances ptrain = InstancesStore.pHeader;
-        // Instances vtrain = InstancesStore.vHeader;
+        Instances ptrain = InstancesStore.pHeader;
+        Instances vtrain = InstancesStore.vHeader;
         ;
         try {
             NetTuning.train(ptrain, vtrain, CV);
@@ -61,10 +60,6 @@ public class Assignment5
     public static void game(int epoch, int fine_tuning_interval){
         //Reinforcement learning controllers:
         String rlController = "controllers.miniAlphaZero.run.Agent";
-
-        //Only pacman game
-        String game = "examples/gridphysics/pacman.txt";
-        String level = "examples/gridphysics/pacman_lvl";
 
         //Other settings
         boolean visuals = true;
@@ -80,7 +75,7 @@ public class Assignment5
             InstancesStore.load();
         for(int i=0; i<epoch; i++){
             String levelfile = level + "0.txt";
-            ArcadeMachine.runOneGame(game, levelfile, visuals, rlController, null, seed, false);
+            ArcadeMachine.runOneGame(makeResourcePath(game), makeResourcePath(levelfile), visuals, rlController, null, seed, false);
             if ((i+1)%fine_tuning_interval == 0)
                 try {
                     NetTuning.updata_net(InstancesStore.pHeader, InstancesStore.vHeader);
@@ -90,10 +85,14 @@ public class Assignment5
         }
     }
 
+    private static String makeResourcePath(String template) {
+        return Assignment5.class.getResource(template).getPath();
+    }
+
     public static void main(String[] args)
     {
         pretraining(5);
-        training(false);
-        game(4, 2);
+        //training(false);
+        //game(4, 2);
     }
 }

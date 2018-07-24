@@ -21,7 +21,7 @@
     </build>
 
     <name>GVGAI-assignment5</name>
-    <description>DeepLearning4j-based RL</description>
+    <description>DeepLearning4j-based pacman game</description>
 
     <properties>
         <!-- Change the nd4j.backend property to nd4j-cuda-8.0-platform, nd4j-cuda-9.0-platform or nd4j-cuda-9.1-platform to use CUDA GPUs -->
@@ -49,6 +49,14 @@
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/nz.ac.waikato.cms.weka/weka-stable -->
+        <dependency>
+            <groupId>nz.ac.waikato.cms.weka</groupId>
+            <artifactId>weka-stable</artifactId>
+            <version>3.6.14</version>
+        </dependency>
+
     </dependencies>
 
 </project>
