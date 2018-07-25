@@ -5,6 +5,9 @@ import controllers.miniAlphaZero.pretraining.*;
 import controllers.miniAlphaZero.simulator.Simulator;
 import core.game.StateObservation;
 import ontology.Types;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 import weka.classifiers.Classifier;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -13,6 +16,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,8 +27,8 @@ import java.util.Map;
  * Time: 21:54
  */
 public class MCST implements Simulator{
-    private Classifier policy_net;
-    private Classifier value_net;
+    private MultiLayerNetwork policy_net;
+    private MultiLayerNetwork value_net;
     private Instances pHeader = InstancesStore.pHeader;
     private Instances vHeader = InstancesStore.vHeader;
     private int SIMULATION_DEPTH = 20;
@@ -34,7 +38,7 @@ public class MCST implements Simulator{
     private final int[] counter;
 
     public MCST(HashMap<Integer, Types.ACTIONS> action_mapping, int SIMULATION_DEPTH, double m_gamma,
-                Classifier policy_net, Classifier value_net){
+                MultiLayerNetwork policy_net, MultiLayerNetwork value_net){
         this.action_mapping = action_mapping;
         this.SIMULATION_DEPTH = SIMULATION_DEPTH;
         this.m_gamma = m_gamma;
@@ -75,14 +79,14 @@ public class MCST implements Simulator{
         for (; depth < SIMULATION_DEPTH; depth++) {
             try {
 
-                Instance pins = new Instance(1, pDataExtractor.featureExtract(stateObs, -1));
-                pins.setDataset(pHeader);
-                int action_num = (int)policy_net.classifyInstance(pins);
+                double[] a_pins = pDataExtractor.featureExtract(stateObs, -1);
+                INDArray pins = Nd4j.create(Arrays.copyOfRange(a_pins, 0, a_pins.length-1));
+                int action_num = policy_net.predict(pins)[0];
 
 
-                Instance vins = new Instance(1, vDataExtractor.featureExtract(stateObs));
-                vins.setDataset(vHeader);
-                double score_before = value_net.classifyInstance(vins);
+                double[] a_vins = vDataExtractor.featureExtract(stateObs);
+                INDArray vins = Nd4j.create(Arrays.copyOfRange(a_vins, 0, a_vins.length-1));
+                double score_before = value_net.predict(vins)[0];
 
                 // double score_before = heuristic.evaluateState(stateObs);
 
@@ -107,9 +111,9 @@ public class MCST implements Simulator{
 
                 stateObs.advance(action);
 
-                vins = new Instance(1, vDataExtractor.featureExtract(stateObs));
-                vins.setDataset(vHeader);
-                double score_after = value_net.classifyInstance(vins);
+                a_vins = vDataExtractor.featureExtract(stateObs);
+                vins = Nd4j.create(Arrays.copyOfRange(a_vins, 0, a_vins.length-1));
+                double score_after = value_net.predict(vins)[0];
 
                 double delta_score = factor * (score_after - score_before);
                 factor = factor * m_gamma;

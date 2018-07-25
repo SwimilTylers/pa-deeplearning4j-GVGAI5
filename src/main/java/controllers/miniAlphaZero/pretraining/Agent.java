@@ -109,7 +109,7 @@ public class Agent extends AbstractPlayer {
 
             if (!location_score.containsKey(location_signature)){
                 location_score.put(location_signature, stateObs.getGameScore());
-                System.out.println();
+                // System.out.println();
 
                 double[] pfeatures = pDataExtractor.featureExtract(stateObs, action_num);
                 Instance pins = new Instance(1, pfeatures);
@@ -149,12 +149,12 @@ public class Agent extends AbstractPlayer {
                         vins.setDataset(vHeader);
                         vHeader.add(vins);
                     }
-                    else
-                        System.out.println("redundant training data, dropped [UNLUCKY]");
+                    else;
+                        // System.out.println("redundant training data, dropped [UNLUCKY]");
 
                 }
-                else
-                    System.out.println("redundant training data, dropped ["+stateObs.getGameScore()+":"+location_score.get(location_signature)+"]");
+                else;
+                    // System.out.println("redundant training data, dropped ["+stateObs.getGameScore()+":"+location_score.get(location_signature)+"]");
             }
         } catch (Exception exc) {
             exc.printStackTrace();

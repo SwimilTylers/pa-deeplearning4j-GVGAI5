@@ -22,6 +22,7 @@ import static weka.core.Debug.DBO.pln;
  * Date: 2018/6/26
  * Time: 0:18
  */
+@Deprecated
 public class NetTuning {
     static private Classifier pLearner = new AdaBoostM1();
     static private Classifier vLearner = new REPTree();

@@ -1,7 +1,8 @@
 import java.lang.annotation.Repeatable;
 import java.util.Random;
 
-import controllers.miniAlphaZero.NetTuning;
+import controllers.miniAlphaZero.deeplearning4j.Dl4jLocalUtils;
+import controllers.miniAlphaZero.deeplearning4j.NetTuning;
 import controllers.miniAlphaZero.pretraining.InstancesStore;
 import core.competition.CompetitionParameters;
 
@@ -51,7 +52,7 @@ public class Assignment5
         Instances vtrain = InstancesStore.vHeader;
         ;
         try {
-            NetTuning.train(ptrain, vtrain, CV);
+            NetTuning.train(Dl4jLocalUtils.getDataSetFromInstances(ptrain), Dl4jLocalUtils.getDataSetFromInstances(vtrain));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -78,7 +79,7 @@ public class Assignment5
             ArcadeMachine.runOneGame(makeResourcePath(game), makeResourcePath(levelfile), visuals, rlController, null, seed, false);
             if ((i+1)%fine_tuning_interval == 0)
                 try {
-                    NetTuning.updata_net(InstancesStore.pHeader, InstancesStore.vHeader);
+                    NetTuning.fine_tuning(Dl4jLocalUtils.getDataSetFromInstances(InstancesStore.pHeader), Dl4jLocalUtils.getDataSetFromInstances(InstancesStore.vHeader));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -91,8 +92,8 @@ public class Assignment5
 
     public static void main(String[] args)
     {
-        pretraining(5);
+        //pretraining(5);
         //training(false);
-        //game(4, 2);
+        game(4, 2);
     }
 }

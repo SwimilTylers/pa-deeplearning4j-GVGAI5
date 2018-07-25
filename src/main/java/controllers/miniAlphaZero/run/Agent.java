@@ -2,13 +2,14 @@ package controllers.miniAlphaZero.run;
 
 import controllers.Heuristics.StateHeuristic;
 import controllers.Heuristics.WinScoreHeuristic;
-import controllers.miniAlphaZero.NetTuning;
+import controllers.miniAlphaZero.deeplearning4j.NetTuning;
 import controllers.miniAlphaZero.pretraining.*;
 import controllers.miniAlphaZero.simulator.MCSampleSimulator;
 import controllers.miniAlphaZero.simulator.Simulator;
 import core.game.StateObservation;
 import core.player.AbstractPlayer;
 import ontology.Types;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import tools.ElapsedCpuTimer;
 import weka.classifiers.Classifier;
 import weka.core.Instance;
@@ -28,8 +29,8 @@ import java.util.Random;
  * Time: 21:52
  */
 public class Agent extends AbstractPlayer{
-    protected Classifier policy_net;
-    protected Classifier value_net;
+    protected MultiLayerNetwork policy_net;
+    protected MultiLayerNetwork value_net;
     protected Random m_rnd;
     private static int SIMULATION_DEPTH = 20;
     private final HashMap<Integer, Types.ACTIONS> action_mapping;
@@ -79,8 +80,8 @@ public class Agent extends AbstractPlayer{
         if (!NetTuning.isTuned)
             NetTuning.load();
 
-        policy_net = NetTuning.getpLearner();
-        value_net = NetTuning.getvLearner();
+        policy_net = NetTuning.getPolicy_net();
+        value_net = NetTuning.getValue_net();
 
         simulator = new MCST(action_mapping, SIMULATION_DEPTH, m_gamma, policy_net, value_net);
     }
