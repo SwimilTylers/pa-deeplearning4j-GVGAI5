@@ -22,6 +22,13 @@ public class Assignment5
     private static String game = "/examples/gridphysics/pacman.txt";
     private static String level = "/examples/gridphysics/pacman_lvl";
 
+    private static double[][] transtable = new double[][]{
+            new double[]{1,0,0,0},
+            new double[]{0,1,0,0},
+            new double[]{0,0,1,0},
+            new double[]{0,0,0,1}
+    };
+
     public static void pretraining(int epoch){
         //Reinforcement learning controllers:
         String rlController = "controllers.miniAlphaZero.pretraining.Agent";
@@ -93,7 +100,7 @@ public class Assignment5
     public static void main(String[] args)
     {
         //pretraining(5);
-        //training(false);
+        training(false);
         game(4, 2);
     }
 }

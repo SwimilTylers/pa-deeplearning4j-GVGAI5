@@ -22,6 +22,9 @@ public class NetTuning {
     private static String pnet_file = "policy";
     private static String vnet_file = "value";
 
+    private static final int pepoch = 2;
+    private static final int vepoch = 200;
+
     static public boolean isTuned = false;
 
     static public int m_maxPolicyPoolSize = 5000;
@@ -47,7 +50,10 @@ public class NetTuning {
     public static void train(DataSet pData, DataSet vData){
         System.out.println("start training net");
         policy_net.setListeners(new ScoreIterationListener(1));
-        policy_net.fit(pData);
+        for (int i = 0; i < pepoch; i++) {
+            policy_net.fit(pData);
+        }
+
         try {
             policy_net.save(new File(pnet_file));
         } catch (IOException e) {
@@ -55,7 +61,10 @@ public class NetTuning {
         }
 
         value_net.setListeners(new ScoreIterationListener(1));
-        value_net.fit(vData);
+        for (int i = 0; i < vepoch; i++) {
+            value_net.fit(vData);
+        }
+
         try {
             value_net.save(new File(vnet_file));
         } catch (IOException e) {
