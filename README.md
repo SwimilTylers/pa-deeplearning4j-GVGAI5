@@ -1,2 +1,5 @@
 # deeplearning4j-transplant
 GVGAI-assignment5 on deeplearning4j
+
+controllers.miniAlphaZero.deeplearning4j.NetConfiguration 设置网络的结构，updater等选项
+controllers.miniAlphaZero.deeplearning4j.NetTuning 进行网络训练
