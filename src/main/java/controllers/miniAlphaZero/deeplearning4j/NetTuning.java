@@ -22,8 +22,8 @@ public class NetTuning {
     private static String pnet_file = "policy";
     private static String vnet_file = "value";
 
-    private static final int pepoch = 2;
-    private static final int vepoch = 200;
+    private static final int pepoch = 20;
+    private static final int vepoch = 10;
 
     static public boolean isTuned = false;
 
@@ -49,7 +49,7 @@ public class NetTuning {
 
     public static void train(DataSet pData, DataSet vData){
         System.out.println("start training net");
-        policy_net.setListeners(new ScoreIterationListener(1));
+        policy_net.setListeners(new ScoreIterationListener(5));
         for (int i = 0; i < pepoch; i++) {
             policy_net.fit(pData);
         }
@@ -60,7 +60,7 @@ public class NetTuning {
             e.printStackTrace();
         }
 
-        value_net.setListeners(new ScoreIterationListener(1));
+        value_net.setListeners(new ScoreIterationListener(10));
         for (int i = 0; i < vepoch; i++) {
             value_net.fit(vData);
         }
@@ -91,12 +91,18 @@ public class NetTuning {
         Random shuffle_rnd = new DefaultRandom();
         System.out.println("start fine tuning");
         DataSet pData = raw_pData.sample(m_maxPolicyPoolSize, shuffle_rnd);
-        policy_net.setListeners(new ScoreIterationListener(1));
-        policy_net.fit(pData);
+        policy_net.setListeners(new ScoreIterationListener(5));
+        for (int i = 0; i < pepoch; i++) {
+            policy_net.fit(pData);
+        }
+
 
         DataSet vData = raw_vData.sample(m_maxValuePolicySize, shuffle_rnd);
-        value_net.setListeners(new ScoreIterationListener(1));
-        value_net.fit(vData);
+        value_net.setListeners(new ScoreIterationListener(10));
+        for (int i = 0; i < vepoch; i++) {
+            value_net.fit(vData);
+        }
+
         System.out.println("finish fine tuning");
     }
 }

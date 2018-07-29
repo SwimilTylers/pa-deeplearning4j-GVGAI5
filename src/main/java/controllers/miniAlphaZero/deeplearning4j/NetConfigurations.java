@@ -7,7 +7,8 @@ import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.activations.Activation;
-import org.nd4j.linalg.learning.config.Sgd;
+import org.nd4j.linalg.learning.config.Adam;
+
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 
 /**
@@ -21,45 +22,48 @@ public class NetConfigurations {
     private static MultiLayerConfiguration vnet_conf;
 
     static {
-        int pInSize = 872, pOutSize = 1;
+        int pInSize = 872, pOutSize = 4;
         int vInSize = 872, vOutSize = 1;
 
         pnet_conf = new NeuralNetConfiguration.Builder()
                 .l2(0.0005)
-                .updater(new Sgd(0.01))
-                .weightInit(WeightInit.UNIFORM)
+                .updater(new Adam())
+                .weightInit(WeightInit.NORMAL)
                 .list()
                 .layer(0, new DenseLayer.Builder()
                         .activation(Activation.SIGMOID)
                         .nIn(pInSize)
-                        .nOut(pInSize + pOutSize)
+                        .nOut(500)
                         .build())
-                .layer(1, new OutputLayer.Builder(LossFunctions.LossFunction.KL_DIVERGENCE)
+                .layer(1, new DenseLayer.Builder()
+                        .activation(Activation.SIGMOID)
+                        .nOut(500)
+                        .build())
+                .layer(2, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
                         .nOut(pOutSize)
-                        .activation(Activation.IDENTITY)
+                        .activation(Activation.SOFTMAX)
                         .build())
                 .setInputType(InputType.feedForward(pInSize))
                 .backprop(true).pretrain(false).build();
 
+
         vnet_conf = new NeuralNetConfiguration.Builder()
                 .l2(0.0005)
-                .updater(new Sgd(0.01))
-                .weightInit(WeightInit.UNIFORM)
+                .updater(new Adam())
+                .weightInit(WeightInit.NORMAL)
                 .list()
                 .layer(0, new DenseLayer.Builder()
                         .activation(Activation.SIGMOID)
                         .nIn(vInSize)
-                        .nOut(vInSize + vOutSize)
+                        .nOut(500)
+                        .dropOut(0.5)
                         .build())
                 .layer(1, new DenseLayer.Builder()
                         .activation(Activation.SIGMOID)
-                        .nOut(vInSize + vOutSize)
+                        .nOut(500)
+                        .dropOut(0.5)
                         .build())
-                .layer(2, new DenseLayer.Builder()
-                        .activation(Activation.SIGMOID)
-                        .nOut(vInSize + vOutSize)
-                        .build())
-                .layer(3, new OutputLayer.Builder(LossFunctions.LossFunction.SQUARED_LOSS)
+                .layer(2, new OutputLayer.Builder(LossFunctions.LossFunction.SQUARED_LOSS)
                         .nOut(vOutSize)
                         .activation(Activation.IDENTITY)
                         .build())

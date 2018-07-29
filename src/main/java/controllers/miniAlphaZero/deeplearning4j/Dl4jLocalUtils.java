@@ -12,6 +12,7 @@ import weka.core.converters.ArffLoader;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -22,6 +23,10 @@ import java.util.Iterator;
  */
 public class Dl4jLocalUtils {
     public static DataSet getDataSetFromInstances(Instances original){
+        return getDataSetFromInstances(original, 0);
+    }
+
+    public static DataSet getDataSetFromInstances(Instances original, int label_one_hot_size){
         INDArray array = null;
         INDArray label = null;
 
@@ -31,8 +36,22 @@ public class Dl4jLocalUtils {
 
         for (int i = 0; i < total_feature; i++) {
             if (i == label_index) {
-                label = Nd4j.create(original.attributeToDoubleArray(i));
-                label = label.reshape(total_instances, 1);
+                double[] label_array = original.attributeToDoubleArray(i);
+                if (label_one_hot_size != 0){
+                    double[][] vec_label_array = new double[total_instances][];
+                    for (int j = 0; j < total_instances; j++) {
+                        double[] buf = new double[label_one_hot_size];
+                        Arrays.fill(buf, 0);
+                        buf[((int) label_array[j])] = 1;
+                        vec_label_array[j] = buf;
+                    }
+                    label = Nd4j.create(vec_label_array);
+                    label = label.reshape(total_instances, label_one_hot_size);
+                }
+                else {
+                    label = Nd4j.create(label_array);
+                    label = label.reshape(total_instances, 1);
+                }
             }
             else {
                 INDArray buffer = Nd4j.create(original.attributeToDoubleArray(i), new int[]{total_instances, 1});
@@ -102,7 +121,7 @@ public class Dl4jLocalUtils {
         Instances info = null;
         ArffLoader ploader = new ArffLoader();
         try {
-            ploader.setFile(new File("test.arff"));
+            ploader.setFile(new File("pData.arff"));
             info = ploader.getDataSet();
             info.setClassIndex(info.numAttributes()-1);
         } catch (IOException e) {
@@ -110,6 +129,7 @@ public class Dl4jLocalUtils {
         }
 
         DataSet ds = getDataSetFromInstances(info);
+        DataSet vds = getDataSetFromInstances(info, 4);
         System.currentTimeMillis();
     }
 }

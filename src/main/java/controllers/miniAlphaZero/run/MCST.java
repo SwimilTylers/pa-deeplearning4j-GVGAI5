@@ -15,10 +15,7 @@ import weka.core.Instances;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -81,6 +78,18 @@ public class MCST implements Simulator{
 
                 double[] a_pins = pDataExtractor.featureExtract(stateObs, -1);
                 INDArray pins = Nd4j.create(Arrays.copyOfRange(a_pins, 0, a_pins.length-1));
+
+                /*
+                int[] pbuf = policy_net.predict(pins);
+                int action_num = 0;
+                for (; action_num < 4; action_num++)
+                    if (pbuf[action_num] == 1)
+                        break;
+                if (action_num == 4) {
+                    System.out.println("random");
+                    action_num = new Random().nextInt(4);
+                }
+                */
                 int action_num = policy_net.predict(pins)[0];
 
 

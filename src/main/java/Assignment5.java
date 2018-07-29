@@ -22,19 +22,13 @@ public class Assignment5
     private static String game = "/examples/gridphysics/pacman.txt";
     private static String level = "/examples/gridphysics/pacman_lvl";
 
-    private static double[][] transtable = new double[][]{
-            new double[]{1,0,0,0},
-            new double[]{0,1,0,0},
-            new double[]{0,0,1,0},
-            new double[]{0,0,0,1}
-    };
+    private static boolean[] gui_switch = new boolean[]{false, true};
 
     public static void pretraining(int epoch){
         //Reinforcement learning controllers:
         String rlController = "controllers.miniAlphaZero.pretraining.Agent";
 
         //Other settings
-        boolean visuals = true;
         int seed = new Random().nextInt();
 
         //Game and level to play
@@ -46,7 +40,7 @@ public class Assignment5
         for(int i=0; i<epoch; i++){
             String levelfile = level + "0.txt";
             System.out.println("Pre-Training at ["+i+","+epoch+"]");
-            ArcadeMachine.runOneGame(makeResourcePath(game), makeResourcePath(levelfile), visuals, rlController, null, seed, false);
+            ArcadeMachine.runOneGame(makeResourcePath(game), makeResourcePath(levelfile), gui_switch[0], rlController, null, seed, false);
             InstancesStore.save();
         }
     }
@@ -59,7 +53,7 @@ public class Assignment5
         Instances vtrain = InstancesStore.vHeader;
         ;
         try {
-            NetTuning.train(Dl4jLocalUtils.getDataSetFromInstances(ptrain), Dl4jLocalUtils.getDataSetFromInstances(vtrain));
+            NetTuning.train(Dl4jLocalUtils.getDataSetFromInstances(ptrain,4), Dl4jLocalUtils.getDataSetFromInstances(vtrain));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -70,7 +64,6 @@ public class Assignment5
         String rlController = "controllers.miniAlphaZero.run.Agent";
 
         //Other settings
-        boolean visuals = true;
         int seed = new Random().nextInt();
 
         //Game and level to play
@@ -83,10 +76,10 @@ public class Assignment5
             InstancesStore.load();
         for(int i=0; i<epoch; i++){
             String levelfile = level + "0.txt";
-            ArcadeMachine.runOneGame(makeResourcePath(game), makeResourcePath(levelfile), visuals, rlController, null, seed, false);
+            ArcadeMachine.runOneGame(makeResourcePath(game), makeResourcePath(levelfile), gui_switch[1], rlController, null, seed, false);
             if ((i+1)%fine_tuning_interval == 0)
                 try {
-                    NetTuning.fine_tuning(Dl4jLocalUtils.getDataSetFromInstances(InstancesStore.pHeader), Dl4jLocalUtils.getDataSetFromInstances(InstancesStore.vHeader));
+                    NetTuning.fine_tuning(Dl4jLocalUtils.getDataSetFromInstances(InstancesStore.pHeader,4), Dl4jLocalUtils.getDataSetFromInstances(InstancesStore.vHeader));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -100,7 +93,7 @@ public class Assignment5
     public static void main(String[] args)
     {
         //pretraining(5);
-        training(false);
+        //training(false);
         game(4, 2);
     }
 }
