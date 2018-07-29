@@ -22,8 +22,8 @@ public class NetTuning {
     private static String pnet_file = "policy";
     private static String vnet_file = "value";
 
-    private static final int pepoch = 20;
-    private static final int vepoch = 10;
+    private static final int pepoch = 40;
+    private static final int vepoch = 400;
 
     static public boolean isTuned = false;
 
